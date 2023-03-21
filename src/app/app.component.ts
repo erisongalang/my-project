@@ -46,10 +46,27 @@ import { NzUploadChangeParam, NzUploadFile } from 'ng-zorro-antd/upload';
 export class NzDemoUploadPictureStyleComponent {
   constructor(private http: HttpClient) {}
 
-  customRequest = (event) => {
-    const uploadfile = event.file;
-    console.log(uploadfile);
-  };
+  // handleChange(info: NzUploadChangeParam): void {
+  //   console.log(event);
+  //   if (info.file.status !== 'uploading') {
+  //     console.log(info.file, info.fileList);
+  //   }
+  //   if (info.file.status === 'done') {
+  //     console.log(info.file.response);
+  //     const { response } = info.file;
+  //     const existingFileIndex = this.fileList1.findIndex(
+  //       (file) => file.name === this.fileList1[0].name
+  //     );
+  //     if (existingFileIndex !== -1) {
+  //       this.fileList1[existingFileIndex].status = 'done';
+  //       this.fileList1[existingFileIndex].url = response['request'];
+  //       this.fileList1[existingFileIndex].thumbUrl =
+  //         response['filters']['resize'];
+  //     }
+  //   } else if (info.file.status === 'error') {
+  //     console.log(`${info.file.name} file upload failed.`);
+  //   }
+  // }
 
   handleChange(info: NzUploadChangeParam): void {
     console.log(event);
@@ -59,74 +76,48 @@ export class NzDemoUploadPictureStyleComponent {
     if (info.file.status === 'done') {
       console.log(info.file.response);
       const { response } = info.file;
-      const existingFileIndex = this.fileList1.findIndex(
-        (file) => file.name === this.fileList1[0].name
-      );
-      if (existingFileIndex !== -1) {
-        this.fileList1[existingFileIndex].status = 'done';
-        this.fileList1[existingFileIndex].url = response['request'];
-        this.fileList1[existingFileIndex].thumbUrl =
-          response['filters']['resize'];
+
+      if (info.file.type === 'image/jpeg' || info.file.type === 'image/png') {
+        this.handleImageUpload(response);
+      } else if (info.file.type === 'application/pdf') {
+        this.handlePdfUpload(response);
+      } else if (info.file.type === 'text/plain') {
+        this.handleTextUpload(response);
+      } else {
+        console.log(`Unsupported file type:`);
       }
     } else if (info.file.status === 'error') {
       console.log(`${info.file.name} file upload failed.`);
     }
-    // event.stopPropagation();
-    // const uploadfile = event.file;
-    // console.log('Current fileList:', uploadfile);
-
-    // const formData = new FormData();
-    // formData.append('file', uploadfile);
-
-    // const endpoint = 'http://localhost:3000/postFile/?name=' + uploadfile.name;
-
-    // const req = new HttpRequest('POST', endpoint, formData, {
-    //   reportProgress: true,
-    //   withCredentials: false,
-    // });
-    // this.http.request(req).subscribe(
-    //   (response) => {
-    //     console.log('Response body:', response);
-    //     if (response['Location']) {
-    //       const newFile: NzUploadFile = {
-    //         uid: Date.now().toString(),
-    //         name: this.fileList1[0].name,
-    //         status: 'done',
-    //         url: response['Location'],
-    //         thumbUrl: response['filters']['resize'],
-    //       };
-    //       this.defaultFileList.push(newFile);
-    //     }
-    //   },
-    //   (error) => {
-    //     console.count('handleChange');
-    //     console.log('Error:', error);
-    //     // ... handle the error here
-    //   }
-    // );
   }
 
-  // handleBeforeUpload(file: NzUploadFile): boolean {
-  //   // Perform any preprocessing on the file here
-  //   // For example, you can modify the file name or add additional metadata
+  handleImageUpload(response: any): void {
+    const existingFileIndex = this.fileList1.findIndex(
+      (file) => file.name === this.fileList1[0].name
+    );
+    if (existingFileIndex !== -1) {
+      this.fileList1[existingFileIndex].status = 'done';
+      this.fileList1[existingFileIndex].url = response['request'];
+      this.fileList1[existingFileIndex].thumbUrl =
+        response['filters']['resize'];
+    }
+  }
 
-  //   // Return true to continue with the upload, or false to cancel it
-  //   return true;
-  // }
+  handlePdfUpload(response: any): void {
+    const existingFileIndex = this.fileList1.findIndex(
+      (file) => file.name === this.fileList1[0].name
+    );
+    if (existingFileIndex !== -1) {
+      this.fileList1[existingFileIndex].status = 'done';
+      this.fileList1[existingFileIndex].url = response['request'];
+      this.fileList1[existingFileIndex].thumbUrl = response['request'];
+    }
+  }
 
-  // handleRemove(file: NzUploadFile): void {
-  //   cons file =
-  // }
+  handleTextUpload(response: any): void {
+    // Handle text file upload logic here
+  }
 
-  defaultFileList: NzUploadFile[] = [
-    {
-      uid: '-1',
-      name: 'xxx.png',
-      status: 'done',
-      url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-      thumbUrl:
-        'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-    },
-  ];
+  defaultFileList: NzUploadFile[] = [];
   fileList1 = [...this.defaultFileList];
 }
